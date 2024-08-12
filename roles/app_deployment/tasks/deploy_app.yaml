@@ -1,0 +1,58 @@
+- name: Create deployment directory
+  become: yes
+  file:
+    path: "{{ deployment_folder }}"
+    state: directory
+
+- name: Create instance directory
+  become: yes
+  file:
+    path: "{{ instance_path }}"
+    state: directory
+
+- name: Create virtual environment
+  become: yes
+  command: python3 -m venv {{ deployment_folder }}/venv
+
+- name: Deploy application wheel
+  become: yes
+  copy:
+    src: "{{ wheel_file }}"
+    dest: "{{ deployment_folder }}/{{ wheel_file }}"
+
+- name: Copy run.sh script
+  become: yes
+  template:
+    src: run.sh.j2
+    dest: "{{ deployment_folder }}/run.sh"
+    mode: '0755'
+
+- name: Deploy configuration file
+  become: yes
+  template:
+    src: config.py.j2
+    dest: "{{ instance_path }}/config.py"
+    mode: '0644'
+
+- name: Install wheel file into virtual environment
+  become: yes
+  command: "{{ deployment_folder }}/venv/bin/pip install {{ deployment_folder }}/{{ wheel_file }}"
+
+- name: Create systemd service file for the application
+  become: yes
+  template:
+    src: example.service.j2
+    dest: /etc/systemd/system/example.service
+
+- name: Reload systemd to pick up new service
+  become: yes
+  command: systemctl daemon-reload
+
+- name: Enable and start the application service
+  become: yes
+  systemd:
+    name: example
+    state: started
+    enabled: yes
+
+

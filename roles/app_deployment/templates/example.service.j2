@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve the example application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory={{ deployment_folder }}
+ExecStart={{ deployment_folder }}/run.sh
+Environment="INSTANCE_PATH={{ instance_path }}"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

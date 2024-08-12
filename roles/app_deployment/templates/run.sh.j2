@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Source the virtual environment
+source {{ deployment_folder }}/venv/bin/activate
+
+# Start the Gunicorn server
+exec gunicorn app:application \
+     --bind 127.0.0.1:{{ app_port }} \
+     --workers 2 \
+     --threads 2
