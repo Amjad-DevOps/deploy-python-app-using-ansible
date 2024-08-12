@@ -1,0 +1,11 @@
+- name: Configure target hosts and deploy application
+  hosts: all
+  become: yes
+  vars_files:
+    - vars/ansible-variables.yaml
+  roles:
+    - role: ca_certs
+      tasks_from: configure_certs.yaml
+    - role: app_deployment
+      tasks_from: deploy_app.yaml
+
